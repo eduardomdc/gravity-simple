@@ -61,6 +61,9 @@ SDL_FPoint randomFPoint(){
 
 void Gravity::randomizeParticles(){
     float spin = 753;
+    if (rand()%2==0){
+        spin *= -1;
+    }
     float radius = 0.01;
     for (int i=0; i<this->particleAmount; i++){
         this->pVel[i] = randomFPoint();
