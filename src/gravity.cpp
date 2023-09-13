@@ -8,7 +8,7 @@
 #include <random>
 
 #define G_CONST 0.1
-#define RES 1000
+#define RES 500
 #define sign(x) ((x<0)-(x>0))
 #define min(a,b) ((a)<(b)?(a):(b))
 
@@ -17,6 +17,26 @@ Gravity::Gravity(int particleAmount, int darkParticles){
     this->particleAmount = particleAmount;
     this->darkParticles = darkParticles;
     this->exit = false;
+    this->paused = false;
+    this->pPoints = new SDL_FPoint[particleAmount];
+    this->pVel = new SDL_FPoint[particleAmount];
+    this->dark = new SDL_FPoint[darkParticles];
+    this->darkVel = new SDL_FPoint[darkParticles];
+    randomizeParticles();
+}
+
+Gravity::~Gravity(){
+    delete this->pPoints;
+    delete this->pVel;
+    delete this->dark;
+    delete this->darkVel;
+}
+
+void Gravity::newSim(){
+    delete this->pPoints;
+    delete this->pVel;
+    delete this->dark;
+    delete this->darkVel;
     this->pPoints = new SDL_FPoint[particleAmount];
     this->pVel = new SDL_FPoint[particleAmount];
     this->dark = new SDL_FPoint[darkParticles];
@@ -40,8 +60,8 @@ SDL_FPoint randomFPoint(){
 }
 
 void Gravity::randomizeParticles(){
-    float spin = 303;
-    float radius = 0.03;
+    float spin = 753;
+    float radius = 0.01;
     for (int i=0; i<this->particleAmount; i++){
         this->pVel[i] = randomFPoint();
         SDL_FPoint pos = randomFPoint();
@@ -62,7 +82,7 @@ void Gravity::randomizeParticles(){
 
 void Gravity::initSDL(){
     if (SDL_Init(SDL_INIT_VIDEO) == 0){
-        this->window = SDL_CreateWindow("my gravity sim",
+        this->window = SDL_CreateWindow("LDSG - Little Dark Spiral Galaxy 0.1",
                 SDL_WINDOWPOS_CENTERED,
                 SDL_WINDOWPOS_CENTERED,
                 RES,
@@ -92,6 +112,16 @@ void Gravity::getInput(){
             this->closeSDL();
             this->exit = true;
             return;
+        case SDL_KEYDOWN:
+            switch (this->currentEvent.key.keysym.sym) {
+                case SDLK_r:
+                    newSim();
+                    break;
+                case SDLK_p:
+                    this->paused = !this->paused;
+                    break;
+            }
+            break;
         }
     }
 }
@@ -120,7 +150,6 @@ void Gravity::update(float delta){
     // update baryonic matter
     for (int i = 0; i < this->particleAmount; i++){
         //check boundaries
-        /*
         if (pPoints[i].x < 0 || pPoints[i].x > RES) {
             pVel[i].x *= -1;
             if (pPoints[i].x < 0) pPoints[i].x = 0;
@@ -131,7 +160,7 @@ void Gravity::update(float delta){
             pVel[i].y *= -1;
             if (pPoints[i].y < 0) pPoints[i].y = 0;
             if (pPoints[i].y > RES) pPoints[i].y = RES;
-        }*/
+        }
         // calculate acceleration with newtonian formula
         SDL_FPoint acc = {0.0, 0.0};
         float soft = 10;
@@ -159,7 +188,7 @@ void Gravity::update(float delta){
         }
         
         // full equation of motion
-        float decay_const = 0.0005;
+        float decay_const = 0.005;
         pPoints[i].x += pVel[i].x*delta + 0.5*acc.x*delta*delta;
         pPoints[i].y += pVel[i].y*delta + 0.5*acc.y*delta*delta;
         // decay_const for electromagnetic interactions modelling
@@ -169,7 +198,7 @@ void Gravity::update(float delta){
     // update dark matter
     for (int i = 0; i < this->darkParticles; i++){
         //check boundaries
-        /*
+        
         if (dark[i].x < 0 || dark[i].x > RES) {
             darkVel[i].x *= -1;
             if (dark[i].x < 0) dark[i].x = 0;
@@ -180,7 +209,7 @@ void Gravity::update(float delta){
             darkVel[i].y *= -1;
             if (dark[i].y < 0) dark[i].y = 0;
             if (dark[i].y > RES) dark[i].y = RES;
-        }*/
+        }
         // calculate acceleration with newtonian formula
         SDL_FPoint acc = {0.0, 0.0};
         float soft = 10;

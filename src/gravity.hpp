@@ -9,6 +9,8 @@
 class Gravity {
 public:
     Gravity(int particlesAmount, int darkParticles);
+    ~Gravity();
+    void newSim();
     void initSDL();
     void randomizeTable();
     void render();
@@ -23,6 +25,7 @@ public:
     SDL_FPoint* dark;
     SDL_FPoint* darkVel;
     bool exit;
+    bool paused;
 private:
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
