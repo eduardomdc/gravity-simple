@@ -8,7 +8,7 @@
 
 class Gravity {
 public:
-    Gravity(int particles);
+    Gravity(int particlesAmount, int darkParticles);
     void initSDL();
     void randomizeTable();
     void render();
@@ -17,8 +17,11 @@ public:
     void getInput();
     void randomizeParticles();
     int particleAmount;
-    SDL_FPoint* particlePoints;
-    SDL_FPoint* particleVel;
+    int darkParticles;
+    SDL_FPoint* pPoints;
+    SDL_FPoint* pVel;
+    SDL_FPoint* dark;
+    SDL_FPoint* darkVel;
     bool exit;
 private:
     SDL_Window* window = nullptr;
